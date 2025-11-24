@@ -2899,17 +2899,20 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
         public static int intcollaborateur;
         private void frmEditDocument_Load_1(object sender, EventArgs e)
         {
-            /*if (lkEdFrns.Text != "")
-            {*/
-                ExecuteStockAlert();
-                ChargerArtFrns();
-                var list = _context.F_FRETS.FirstOrDefault(p => p.DO_PIECE == dopiecetxt.Text);
-                if (list.DO_MONTANT.ToString() != "")
+            ExecuteStockAlert();
+            ChargerArtFrns();
+            var list = _context.F_FRETS.FirstOrDefault(p => p.DO_PIECE == dopiecetxt.Text);
+
+            if(list != null) { 
+                try
                 {
-                    txt_prix.Text = list.DO_MONTANT.ToString("N2");
-                    txt_poids.Text = list.DO_POIDS.ToString("N2");
-                }
-            //}
+                    if (list.DO_MONTANT.ToString() != "")
+                    {
+                        txt_prix.Text = list.DO_MONTANT.ToString("N2");
+                        txt_poids.Text = list.DO_POIDS.ToString("N2");
+                    }
+                }catch(Exception ef) { }
+            }
           
             LkDevise_EditValueChanged(sender, e);
 
