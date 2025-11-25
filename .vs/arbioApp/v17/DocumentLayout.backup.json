@@ -3,15 +3,15 @@
   "WorkspaceRootPath": "D:\\Arbiochem\\Travail\\erp\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{78D775A6-87D6-4010-86C9-4DDC40FBCA69}|arbioApp\\arbioApp.csproj|d:\\arbiochem\\travail\\erp\\arbioapp\\modules\\principal\\di\\2_documents\\frmeditdocument.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{78D775A6-87D6-4010-86C9-4DDC40FBCA69}|arbioApp\\arbioApp.csproj|D:\\Arbiochem\\Travail\\erp\\arbioapp\\modules\\principal\\di\\2_documents\\frmeditdocument.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{78D775A6-87D6-4010-86C9-4DDC40FBCA69}|arbioApp\\arbioApp.csproj|solutionrelative:arbioapp\\modules\\principal\\di\\2_documents\\frmeditdocument.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{78D775A6-87D6-4010-86C9-4DDC40FBCA69}|arbioApp\\arbioApp.csproj|D:\\Arbiochem\\Travail\\erp\\arbioapp\\modules\\principal\\di\\2_documents\\frmeditdocument.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{78D775A6-87D6-4010-86C9-4DDC40FBCA69}|arbioApp\\arbioApp.csproj|d:\\arbiochem\\travail\\erp\\arbioapp\\modules\\principal\\di\\2_documents\\frmeditdocument.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{78D775A6-87D6-4010-86C9-4DDC40FBCA69}|arbioApp\\arbioApp.csproj|solutionrelative:arbioapp\\modules\\principal\\di\\2_documents\\frmeditdocument.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{78D775A6-87D6-4010-86C9-4DDC40FBCA69}|arbioApp\\arbioApp.csproj|d:\\arbiochem\\travail\\erp\\arbioapp\\modules\\principal\\di\\2_documents\\ucdocuments.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{78D775A6-87D6-4010-86C9-4DDC40FBCA69}|arbioApp\\arbioApp.csproj|D:\\Arbiochem\\Travail\\erp\\arbioapp\\modules\\principal\\di\\2_documents\\ucdocuments.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{78D775A6-87D6-4010-86C9-4DDC40FBCA69}|arbioApp\\arbioApp.csproj|solutionrelative:arbioapp\\modules\\principal\\di\\2_documents\\ucdocuments.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -46,8 +46,7 @@
               "RelativeToolTip": "arbioApp\\Modules\\Principal\\DI\\2_Documents\\ucDocuments.cs",
               "ViewState": "AgIAAIMAAAAAAAAAAAAkwJAAAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-24T13:57:37.074Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-24T13:57:37.074Z"
             },
             {
               "$type": "Document",
@@ -82,7 +81,7 @@
               "RelativeDocumentMoniker": "arbioApp\\Modules\\Principal\\DI\\2_Documents\\frmEditDocument.cs",
               "ToolTip": "D:\\Arbiochem\\Travail\\erp\\arbioApp\\Modules\\Principal\\DI\\2_Documents\\frmEditDocument.cs",
               "RelativeToolTip": "arbioApp\\Modules\\Principal\\DI\\2_Documents\\frmEditDocument.cs",
-              "ViewState": "AgIAAPMDAAAAAAAAAAAswPkDAAAsAAAAAAAAAA==",
+              "ViewState": "AgIAAGgNAAAAAAAAAAApwG8NAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-24T05:39:57.447Z",
               "EditorCaption": ""

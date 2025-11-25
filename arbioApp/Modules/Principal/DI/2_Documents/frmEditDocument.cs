@@ -3295,140 +3295,149 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
         public static int intcollaborateur;
         private void frmEditDocument_Load_1(object sender, EventArgs e)
         {
-            ExecuteStockAlert();
-            ChargerArtFrns();
-            var list = _context.F_FRETS.FirstOrDefault(p => p.DO_PIECE == dopiecetxt.Text);
+            var test_exist = _context.F_DOCENTETE.FirstOrDefault(x => x.DO_Piece == dopiecetxt.Text.ToString());
 
-            if(list != null) { 
-                try
-                {
-                    if (list.DO_MONTANT.ToString() != "")
-                    {
-                        txt_prix.Text = list.DO_MONTANT.ToString("N2");
-                        txt_poids.Text = list.DO_POIDS.ToString("N2");
-                    }
-                }catch(Exception ef) { }
-            }
-          
-            LkDevise_EditValueChanged(sender, e);
-
-            GridColumn col_unite = gvLigneEdit.Columns.AddField("Unite");
-            col_unite.Caption = "Unité";
-            col_unite.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
-            col_unite.Visible = true;
-            col_unite.OptionsColumn.AllowEdit = false;
-            col_unite.OptionsColumn.ReadOnly = true;
-            col_unite.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
-
-            GridColumn col = gvLigneEdit.Columns.AddField("FRET");
-            col.Caption = "FRET";
-            col.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
-            col.Visible = true;
-            col.OptionsColumn.AllowEdit = true;
-            col.OptionsColumn.ReadOnly = false;
-
-            GridColumn col1 = gvLigneEdit.Columns.AddField("Total Frais");
-            col1.Caption = "Total Frais";
-            col1.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
-            col1.Visible = true;
-
-
-            // 2. Positionnement avant DL_FRAIS
-            int indexFrais = gvLigneEdit.Columns["DL_Frais"].VisibleIndex;
-            col.VisibleIndex = indexFrais;
-            col1.VisibleIndex = indexFrais+2;
-
-            // 2. Positionnement avant DL_PrixUnitaire
-            int indexPrixUnitaire = gvLigneEdit.Columns["DL_PrixUnitaire"].VisibleIndex;
-            col_unite.VisibleIndex = indexPrixUnitaire - 1;
-
-            gvLigneEdit.CustomUnboundColumnData += (sender, e) =>
+            if (test_exist != null)
             {
-                if (e.IsGetData)
+                ExecuteStockAlert();
+                ChargerArtFrns();
+                var list = _context.F_FRETS.FirstOrDefault(p => p.DO_PIECE == dopiecetxt.Text);
+
+                if (list != null)
                 {
-                    if (e.Column.FieldName == "FRET")
+                    try
                     {
-                        try
+                        if (list.DO_MONTANT.ToString() != "")
                         {
-                            decimal poidsNet = Convert.ToDecimal(gvLigneEdit.GetListSourceRowCellValue(e.ListSourceRowIndex, "DL_PoidsNet"));
-                            if (txt_prix.Text != "" && Convert.ToDecimal(txt_prix.Text.ToString()) > 0)
-                            {
-                                decimal prix = Convert.ToDecimal(txt_prix.Text);
-                                decimal poids = Convert.ToDecimal(txt_poids.Text);
-
-                                decimal fret = (poidsNet * prix) / poids;
-                                if (fret < 0) fret = 0m;
-
-                                e.Value = fret.ToString("N2");
-                            }
-                        }catch(Exception es) { }
+                            txt_prix.Text = list.DO_MONTANT.ToString("N2");
+                            txt_poids.Text = list.DO_POIDS.ToString("N2");
+                        }
                     }
-                    else if (e.Column.FieldName == "Total Frais")
+                    catch (Exception ef) { }
+                }
+
+                LkDevise_EditValueChanged(sender, e);
+
+                GridColumn col_unite = gvLigneEdit.Columns.AddField("Unite");
+                col_unite.Caption = "Unité";
+                col_unite.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+                col_unite.Visible = true;
+                col_unite.OptionsColumn.AllowEdit = false;
+                col_unite.OptionsColumn.ReadOnly = true;
+                col_unite.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
+
+                GridColumn col = gvLigneEdit.Columns.AddField("FRET");
+                col.Caption = "FRET";
+                col.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+                col.Visible = true;
+                col.OptionsColumn.AllowEdit = true;
+                col.OptionsColumn.ReadOnly = false;
+
+                GridColumn col1 = gvLigneEdit.Columns.AddField("Total Frais");
+                col1.Caption = "Total Frais";
+                col1.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+                col1.Visible = true;
+
+
+                // 2. Positionnement avant DL_FRAIS
+                int indexFrais = gvLigneEdit.Columns["DL_Frais"].VisibleIndex;
+                col.VisibleIndex = indexFrais;
+                col1.VisibleIndex = indexFrais + 2;
+
+                // 2. Positionnement avant DL_PrixUnitaire
+                int indexPrixUnitaire = gvLigneEdit.Columns["DL_PrixUnitaire"].VisibleIndex;
+                col_unite.VisibleIndex = indexPrixUnitaire - 1;
+
+                gvLigneEdit.CustomUnboundColumnData += (sender, e) =>
+                {
+                    if (e.IsGetData)
                     {
-                        decimal fret = Convert.ToDecimal(gvLigneEdit.GetListSourceRowCellValue(e.ListSourceRowIndex, "FRET"));
-                        decimal dlFrais = 0m;
-                        object val = gvLigneEdit.GetListSourceRowCellValue(e.ListSourceRowIndex, "DL_Frais");
-                        if (val != null && val != DBNull.Value)
-                            dlFrais = Convert.ToDecimal(val);
-
-                        decimal tot_frais = dlFrais + fret;
-                        e.Value = tot_frais; // reste un decimal
-
-                        //Récupération unité
-
-                        try
+                        if (e.Column.FieldName == "FRET")
                         {
-                            string reference = gvLigneEdit.GetListSourceRowCellValue(e.ListSourceRowIndex, "AR_Ref").ToString();
-                            var recup = _context.F_ARTFOURNISS
-                            .FirstOrDefault(x => x.AR_Ref == reference);
-
-                            if (recup != null)
+                            try
                             {
-                                string uniteLibelle = _context.P_UNITE
-                                 .Where(u => u.cbMarq == recup.AF_Unite)
-                                 .Select(u => u.U_Intitule)
-                                 .FirstOrDefault();
-
-                                gvLigneEdit.CustomColumnDisplayText += (s, e) =>
+                                decimal poidsNet = Convert.ToDecimal(gvLigneEdit.GetListSourceRowCellValue(e.ListSourceRowIndex, "DL_PoidsNet"));
+                                if (txt_prix.Text != "" && Convert.ToDecimal(txt_prix.Text.ToString()) > 0)
                                 {
-                                    if (e.Column.FieldName == "Unite")
-                                    {
-                                        e.DisplayText = uniteLibelle ?? ""; // juste la string
-                                    }
-                                };
+                                    decimal prix = Convert.ToDecimal(txt_prix.Text);
+                                    decimal poids = Convert.ToDecimal(txt_poids.Text);
 
+                                    decimal fret = (poidsNet * prix) / poids;
+                                    if (fret < 0) fret = 0m;
+
+                                    e.Value = fret.ToString("N2");
+                                }
                             }
-                        }catch(Exception pl) { }
+                            catch (Exception es) { }
+                        }
+                        else if (e.Column.FieldName == "Total Frais")
+                        {
+                            decimal fret = Convert.ToDecimal(gvLigneEdit.GetListSourceRowCellValue(e.ListSourceRowIndex, "FRET"));
+                            decimal dlFrais = 0m;
+                            object val = gvLigneEdit.GetListSourceRowCellValue(e.ListSourceRowIndex, "DL_Frais");
+                            if (val != null && val != DBNull.Value)
+                                dlFrais = Convert.ToDecimal(val);
 
+                            decimal tot_frais = dlFrais + fret;
+                            e.Value = tot_frais; // reste un decimal
+
+                            //Récupération unité
+
+                            try
+                            {
+                                string reference = gvLigneEdit.GetListSourceRowCellValue(e.ListSourceRowIndex, "AR_Ref").ToString();
+                                var recup = _context.F_ARTFOURNISS
+                                .FirstOrDefault(x => x.AR_Ref == reference);
+
+                                if (recup != null)
+                                {
+                                    string uniteLibelle = _context.P_UNITE
+                                     .Where(u => u.cbMarq == recup.AF_Unite)
+                                     .Select(u => u.U_Intitule)
+                                     .FirstOrDefault();
+
+                                    gvLigneEdit.CustomColumnDisplayText += (s, e) =>
+                                    {
+                                        if (e.Column.FieldName == "Unite")
+                                        {
+                                            e.DisplayText = uniteLibelle ?? ""; // juste la string
+                                        }
+                                    };
+
+                                }
+                            }
+                            catch (Exception pl) { }
+
+                        }
                     }
-                }
-            };
+                };
 
-            GridColumn colFret = gvLigneEdit.Columns["DL_PoidsNet"];
-            RepositoryItemTextEdit textEdit = new RepositoryItemTextEdit();
-            colFret.ColumnEdit = textEdit;
+                GridColumn colFret = gvLigneEdit.Columns["DL_PoidsNet"];
+                RepositoryItemTextEdit textEdit = new RepositoryItemTextEdit();
+                colFret.ColumnEdit = textEdit;
 
-            textEdit.KeyPress += (sender, e) =>
-            {
-                // Remplacer le point par une virgule
-                if (e.KeyChar == '.')
+                textEdit.KeyPress += (sender, e) =>
                 {
-                    e.KeyChar = ',';
-                }
+                    // Remplacer le point par une virgule
+                    if (e.KeyChar == '.')
+                    {
+                        e.KeyChar = ',';
+                    }
 
-                // Autoriser uniquement chiffres, virgule et contrôle (backspace)
-                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != ',')
-                {
-                    e.Handled = true;  // bloque la saisie
-                }
+                    // Autoriser uniquement chiffres, virgule et contrôle (backspace)
+                    if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != ',')
+                    {
+                        e.Handled = true;  // bloque la saisie
+                    }
 
-                // Autoriser une seule virgule
-                TextEdit editor = sender as TextEdit;
-                if (e.KeyChar == ',' && editor.Text.Contains(","))
-                {
-                    e.Handled = true;
-                }
-            };
+                    // Autoriser une seule virgule
+                    TextEdit editor = sender as TextEdit;
+                    if (e.KeyChar == ',' && editor.Text.Contains(","))
+                    {
+                        e.Handled = true;
+                    }
+                };
+            }
         }
 
 private void datelivrprev_EditValueChanged(object sender, EventArgs e)
