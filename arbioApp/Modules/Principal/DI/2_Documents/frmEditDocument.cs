@@ -1015,7 +1015,7 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                         newRow["AR_Ref"] = AR_Ref;
                         //newRow["cbAR_Ref"] = CT_Num;
                         newRow["DL_Design"] = DL_Design;
-                        newRow["DL_Qte"] = Qte_propice;
+                        newRow["DL_Qte"] = 0;
                         newRow["DL_QteBC"] = 0;
                         newRow["DL_QteBL"] = 0;
                         //newRow["DL_PoidsNet"] = CT_Num;
@@ -3190,6 +3190,9 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                     };
                 }
             }
+
+            gvLigneEdit.UpdateSummary();
+            gvLigneEdit.RefreshData();
         }
         private decimal GetArticlePU(string arRef)
         {
@@ -3373,26 +3376,29 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
 
                         //Récupération unité
 
-                        string reference = gvLigneEdit.GetListSourceRowCellValue(e.ListSourceRowIndex, "AR_Ref").ToString();
-                        var recup = _context.F_ARTFOURNISS
-                        .FirstOrDefault(x => x.AR_Ref == reference);
-
-                        if (recup != null)
+                        try
                         {
-                            string uniteLibelle = _context.P_UNITE
-                             .Where(u => u.cbMarq == recup.AF_Unite)
-                             .Select(u => u.U_Intitule)
-                             .FirstOrDefault();
+                            string reference = gvLigneEdit.GetListSourceRowCellValue(e.ListSourceRowIndex, "AR_Ref").ToString();
+                            var recup = _context.F_ARTFOURNISS
+                            .FirstOrDefault(x => x.AR_Ref == reference);
 
-                            gvLigneEdit.CustomColumnDisplayText += (s, e) =>
+                            if (recup != null)
                             {
-                                if (e.Column.FieldName == "Unite")
-                                {
-                                    e.DisplayText = uniteLibelle ?? ""; // juste la string
-                                }
-                            };
+                                string uniteLibelle = _context.P_UNITE
+                                 .Where(u => u.cbMarq == recup.AF_Unite)
+                                 .Select(u => u.U_Intitule)
+                                 .FirstOrDefault();
 
-                        }
+                                gvLigneEdit.CustomColumnDisplayText += (s, e) =>
+                                {
+                                    if (e.Column.FieldName == "Unite")
+                                    {
+                                        e.DisplayText = uniteLibelle ?? ""; // juste la string
+                                    }
+                                };
+
+                            }
+                        }catch(Exception pl) { }
 
                     }
                 }
