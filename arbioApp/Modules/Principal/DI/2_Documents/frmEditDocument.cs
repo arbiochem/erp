@@ -21,6 +21,7 @@ using DevExpress.Pdf.Xmp;
 using DevExpress.Spreadsheet;
 using DevExpress.UIAutomation;
 using DevExpress.Utils.About;
+using DevExpress.Xpo.DB.Helpers;
 using DevExpress.XtraBars.Customization;
 using DevExpress.XtraCharts.Native;
 using DevExpress.XtraEditors;
@@ -935,6 +936,8 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                 }
             }
         }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
         public void Purchase_HyperlinkClick(object sender, EventArgs e)
         {
             try
@@ -1132,7 +1135,7 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                              .Select(u => u.U_Intitule)
                              .FirstOrDefault();
 
-                            gvLigneEdit.CustomColumnDisplayText += (s, e) =>
+                            gvLigneEdit.CustomColumnDisplayText += (s,e) =>
                             {
                                 if (e.Column.FieldName == "Unite")
                                 {
@@ -1141,8 +1144,6 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                             };
 
                         }
-
-
                     }
                     else
                     {
@@ -1868,6 +1869,44 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
             AddLigne();
         }
 
+        private DataTable ExecuteQuery(string connectionString, string query)
+        {
+            DataTable dt = new DataTable();
+
+            try
+            {
+                // Modifier le timeout pour éviter les blocages
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(connectionString);
+                builder.ConnectTimeout = 5;
+                builder.ConnectRetryCount = 0;
+
+                using (SqlConnection conn = new SqlConnection(builder.ConnectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.CommandTimeout = 10;
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                        {
+                            adapter.Fill(dt);
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erreur SQL : {ex.Message}");
+                // Retourner une DataTable vide sans afficher d'erreur
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erreur : {ex.Message}");
+            }
+
+            return dt;
+        }
+
+
         public void ExecuteStockAlert()
         {
             try
@@ -1875,19 +1914,53 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                 string query1 = @"SELECT * FROM dbo.VW_ETAT_STOCK WHERE CT_INTITULE='" + lkEdFrns.Text + "'";
 
 
-                string connectionStringArbapp = $"Server = tcp:{FrmMdiParent.DataSourceNameValueParent},1433;" +
-                                                $"Database=ARBIOCHEM;User ID=Dev;Password=1234;" +
-                                                $"TrustServerCertificate=True;Connection Timeout=120;";
+                string connectionStringArbapp = $"Server={FrmMdiParent.DataSourceNameValueParent};" +
+                                 $"Database=ARBIOCHEM;" +
+                                 $"User ID=Dev;" +
+                                 $"Password=1234;" +
+                                 $"TrustServerCertificate=True;" +
+                                 $"Connection Timeout=120;";
 
-                DataTable dtMaster;
+                DataTable dtMaster = null;
                 try
                 {
-                    dtMaster = arbioApp.Modules.Principal.BrowsSites.ExecuteQueryOnMultipleServers(connectionStringArbapp, query1);
+                    if (string.IsNullOrEmpty(connectionStringArbapp))
+                    {
+                        // Log l'erreur
+                        throw new ArgumentException("Chaîne de connexion vide");
+                    }
+
+                    // Utilisation
+                    dtMaster = ExecuteQuery(connectionStringArbapp, query1);
+                }
+                catch (SqlException sqlEx)
+                {
+                    // Log l'erreur SQL spécifique
+                    System.Diagnostics.EventLog.WriteEntry("Application",
+                        $"Erreur SQL: {sqlEx.Message}\nCode: {sqlEx.Number}\nServeur: {sqlEx.Server}",
+                        System.Diagnostics.EventLogEntryType.Error);
+                    return;
+                }
+                catch (TimeoutException timeEx)
+                {
+                    // Log timeout
+                    System.Diagnostics.EventLog.WriteEntry("Application",
+                        $"Timeout: {timeEx.Message}",
+                        System.Diagnostics.EventLogEntryType.Warning);
+                    return;
                 }
                 catch (Exception ex)
                 {
-                    // Vous pouvez logger ici
-                    throw new InvalidOperationException("Échec de la récupération des données depuis la base de données.", ex);
+                    // Log toute autre erreur
+                    System.Diagnostics.EventLog.WriteEntry("Application",
+                        $"Erreur: {ex.Message}\nStack: {ex.StackTrace}",
+                        System.Diagnostics.EventLogEntryType.Error);
+                    return;
+                }
+
+                if (dtMaster == null || dtMaster.Rows.Count == 0)
+                {
+                    return;
                 }
 
                 if (dtMaster == null)
@@ -1898,7 +1971,6 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                 treeList1.BeginUpdate();
                 treeList1.ClearNodes();
                 treeList1.Columns.Clear();
-
 
                 var parentColumns = new[]
                     { "SITE", "FAMILLE", "REFERENCE", "DESIGNATION", "CT_Num", "CT_Intitule", "PURCHASE", "AF_PrixAch" };
@@ -1987,7 +2059,10 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
 
                 treeList1.EndUpdate();
             }
-            catch (Exception ex) { }
+            catch (Exception ex) 
+            {
+                return;
+            }
             
         }
 
