@@ -1915,7 +1915,7 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
 
 
                 string connectionStringArbapp = $"Server={FrmMdiParent.DataSourceNameValueParent};" +
-                                 $"Database=ARBIOCHEM_ACHAT;" +
+                                 $"Database={ucDocuments.dbNamePrincipale};" +
                                  $"User ID=Dev;" +
                                  $"Password=1234;" +
                                  $"TrustServerCertificate=True;" +
