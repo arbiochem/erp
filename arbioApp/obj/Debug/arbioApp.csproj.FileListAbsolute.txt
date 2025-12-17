@@ -75,11 +75,7 @@ D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\Microsoft.ReportViewer.ProcessingObj
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\Microsoft.ReportViewer.WinForms.dll
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\Microsoft.SqlServer.Types.dll
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\MimeKit.dll
-D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Buffers.dll
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Formats.Asn1.dll
-D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Memory.dll
-D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Numerics.Vectors.dll
-D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Threading.Tasks.Extensions.dll
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.ValueTuple.dll
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\DevExpress.XtraDiagram.v24.1.dll
@@ -165,11 +161,7 @@ D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\MailKit.xml
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\MailKit.dll.config
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\MimeKit.pdb
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\MimeKit.xml
-D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Buffers.xml
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Formats.Asn1.xml
-D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Memory.xml
-D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Numerics.Vectors.xml
-D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.Threading.Tasks.Extensions.xml
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\System.ValueTuple.xml
 D:\Arbiochem\Travail\ERP\arbioApp\bin\Debug\DevExpress.XtraDiagram.v24.1.xml
