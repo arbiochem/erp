@@ -43,6 +43,7 @@ using DevExpress.XtraSpreadsheet.Import.Xls;
 using DevExpress.XtraTab;
 using DevExpress.XtraTreeList;
 using DevExpress.XtraTreeList.Nodes;
+using MailKit.Search;
 using Microsoft.Office.Interop.Outlook;
 using Org.BouncyCastle.Tls;
 //using Syncfusion.Windows.Forms.Maps;
@@ -83,6 +84,10 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
         private static string serveripPrincipale = ucDocuments.serverIpPrincipale;
         //DECLARATIONS
         private static string connectionString = $"Server={serveripPrincipale};Database={dbPrincipale};" +
+                                                 $"User ID=Dev;Password=1234;TrustServerCertificate=True;" +
+                                                 $"Connection Timeout=240;";
+
+        private static string connectionString_f = $"Server={serveripPrincipale};Database=ARBIOCHEM_ACHAT;" +
                                                  $"User ID=Dev;Password=1234;TrustServerCertificate=True;" +
                                                  $"Connection Timeout=240;";
         private readonly AppDbContext _context;
@@ -484,7 +489,7 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
             string query = "SELECT CT_Num, CT_Intitule FROM F_COMPTET WHERE CT_Type = 1";
             List<F_COMPTET> fournisseurs = new List<F_COMPTET>();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(connectionString_f))
             {
                 try
                 {
@@ -943,6 +948,8 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
         {
             try
             {
+
+                
                 TreeListNode focusedNode = treeList1.FocusedNode;
                 short typeDoc = (short)_f_DOCENTETEService.GetDocTypeNo(dopiecetxt.Text.Substring(0, 3));
 
@@ -1127,8 +1134,8 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                             newRow["Validation"] = "Update";
                             //newRow["Insertion"] = "Add";
 
-
                             dt.Rows.Add(newRow);
+                          
                             gvLigneEdit.FocusedRowHandle = dt.Rows.IndexOf(newRow);
                             lkEdFrns.Text = CT_Num;
                             gvLigneEdit.BestFitColumns();
@@ -1415,24 +1422,24 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                                         DataTable dt = (DataTable)gvLigneEdit.GridControl.DataSource;
                                         string doPiece = dopiecetxt.Text;//dt.Rows[row]["DO_Piece"].ToString();
                                         decimal totalHTNet = dt.AsEnumerable()
-                                                        .Where(row =>
-                                                            row["DL_MontantHT"] != DBNull.Value &&
-                                                            row["DO_Piece"] != DBNull.Value &&
-                                                            row["Retenu"] != DBNull.Value &&
-                                                            Convert.ToInt32(row["Retenu"]) != 0 &&
-                                                            row["DO_Piece"].ToString() == doPiece
-                                                        )
-                                                        .Sum(row => Convert.ToDecimal(row["DL_MontantHT"]));
+                                        .Where(r =>
+                                            r["DL_MontantHT"] != DBNull.Value &&
+                                            r["DO_Piece"] != DBNull.Value &&
+                                            r["Retenu"] != DBNull.Value &&
+                                            Convert.ToInt32(r["Retenu"]) != 0 &&
+                                            r["DO_Piece"].ToString() == doPiece
+                                        )
+                                        .Sum(r => Convert.ToDecimal(r["DL_MontantHT"]));
 
                                         decimal totalTTCNet = dt.AsEnumerable()
-                                                        .Where(row =>
-                                                            row["DL_MontantTTC"] != DBNull.Value &&
-                                                            row["DO_Piece"] != DBNull.Value &&
-                                                            row["Retenu"] != DBNull.Value &&
-                                                            Convert.ToInt32(row["Retenu"]) != 0 &&
-                                                            row["DO_Piece"].ToString() == doPiece
+                                                        .Where(r =>
+                                                            r["DL_MontantTTC"] != DBNull.Value &&
+                                                            r["DO_Piece"] != DBNull.Value &&
+                                                            r["Retenu"] != DBNull.Value &&
+                                                            Convert.ToInt32(r["Retenu"]) != 0 &&
+                                                            r["DO_Piece"].ToString() == doPiece
                                                         )
-                                                        .Sum(row => Convert.ToDecimal(row["DL_MontantTTC"]));
+                                                        .Sum(r => Convert.ToDecimal(r["DL_MontantTTC"]));
                                         //// Mise à jour entête de document (F_DOCENTETE)
                                         int retenu = Convert.ToInt16(gvLigneEdit.GetRowCellValue(row, "Retenu"));
                                         _f_DOCENTETEService.UpdateDO_Totaux_HT_Net_TTC(dopiecetxt.Text, puNet, quantiteEcriteStock, totalHTNet, totalTTCNet);
@@ -1480,7 +1487,6 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                                     }
                                     InitializeGrid(gcLigneEdit, dopiecetxt.Text);
                                     gvLigneEdit.UpdateSummary();
-
 
                                 }
                                 catch (System.Exception ex)
@@ -3429,6 +3435,7 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
             DevExpress.Utils.HorzAlignment.Center;
 
             treeList1.OptionsFind.ExpandNodesOnIncrementalSearch = true;
+
             var test_exist = _context.F_DOCENTETE.FirstOrDefault(x => x.DO_Piece == dopiecetxt.Text.ToString());
 
             if (test_exist != null)
@@ -3729,6 +3736,51 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
             }
             else
             {
+                string connectionStringArbio = $"Server=26.53.123.231;Database=ARBIOCHEM_ACHAT;" +
+                                                 $"User ID=Dev;Password=1234;TrustServerCertificate=True;" +
+                                                 $"Connection Timeout=240;";
+
+                using (SqlConnection connection = new SqlConnection(connectionStringArbio))
+                {
+                    connection.Open();
+
+                    using (SqlTransaction tran = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            string sql = @"
+                            DELETE FROM encoursutilisation
+                            WHERE utilisateur = @utilisateur AND numero_doc=@numero_doc";
+
+                            using (SqlCommand cmd = new SqlCommand(sql, connection, tran))
+                            {
+                                cmd.Parameters.Add("@utilisateur", SqlDbType.VarChar)
+                                              .Value = FrmMdiParent.IDName;
+                                cmd.Parameters.Add("@numero_doc", SqlDbType.VarChar)
+                                             .Value = dopiecetxt.Text;
+
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            // Validation
+                            tran.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            // Annulation si erreur
+                            if (tran != null)
+                                tran.Rollback();
+
+                            MessageBox.Show(
+                                ex.Message,
+                                "Erreur",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error
+                            );
+                        }
+                    }
+                }
+
                 if (StatutActuel < 2)
                 {
                     MessageBox.Show("Le statut actuel ne permet pas de transformer le document.", "Information");
@@ -3851,78 +3903,81 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                             try
                             {
                                 //string connectionString = "Server=26.71.34.164;Database=TRANSIT;Trusted_Connection=True;";
-                                string connectionString = "Server=localhost;Database=TRANSIT;Trusted_Connection=True;";
+                                /* string connectionString = "Server=localhost;Database=TRANSIT;Trusted_Connection=True;";
 
-                                using (SqlConnection connection = new SqlConnection(connectionString))
-                                {
-                                    connection.Open();
+                                 using (SqlConnection connection = new SqlConnection(connectionString))
+                                 {
+                                     connection.Open();
 
-                                    string existingStock = @"
-                                    SELECT TOP 1 AS_QteSto
-                                    FROM F_ARTSTOCK
-                                    WHERE AR_Ref = @AR_Ref AND DE_No = @DE_No";
+                                     string existingStock = @"
+                                     SELECT TOP 1 AS_QteSto
+                                     FROM F_ARTSTOCK
+                                     WHERE AR_Ref = @AR_Ref AND DE_No = @DE_No";
 
-                                    decimal? existingQte = null;
+                                     decimal? existingQte = null;
 
-                                    using (SqlCommand checkCmd = new SqlCommand(existingStock, connection))
-                                    {
-                                        checkCmd.Parameters.AddWithValue("@AR_Ref", reference);
-                                        checkCmd.Parameters.AddWithValue("@DE_No", DE_No);
+                                     using (SqlCommand checkCmd = new SqlCommand(existingStock, connection))
+                                     {
+                                         checkCmd.Parameters.AddWithValue("@AR_Ref", reference);
+                                         checkCmd.Parameters.AddWithValue("@DE_No", DE_No);
 
-                                        var result = checkCmd.ExecuteScalar();
-                                        if (result != null && result != DBNull.Value)
-                                            existingQte = Convert.ToDecimal(result);
-                                    }
-                                    if (existingQte == null)
-                                    {
-                                        string insertSql = @"
-                                            INSERT INTO F_ARTSTOCK (
-                                                AR_Ref,
-                                                DE_No,
-                                                DP_NoPrincipal,
-                                                AS_QteSto,
-                                                AS_QteRes,
-                                                AS_QteCom,
-                                                AS_QtePrepa,
-                                                AS_MontSto,
-                                                AS_QteMini,
-                                                AS_QteMaxi
-                                            )
-                                            VALUES (
-                                                @AR_Ref,
-                                                @DE_No,
-                                                @DP_NoPrincipal,
-                                                @Qte,
-                                                0, 0, 0, 0, 0, 0
-                                            )";
+                                         var result = checkCmd.ExecuteScalar();
+                                         if (result != null && result != DBNull.Value)
+                                             existingQte = Convert.ToDecimal(result);
+                                     }
+                                     if (existingQte == null)
+                                     {
+                                         string insertSql = @"
+                                             INSERT INTO F_ARTSTOCK (
+                                                 AR_Ref,
+                                                 DE_No,
+                                                 DP_NoPrincipal,
+                                                 AS_QteSto,
+                                                 AS_QteRes,
+                                                 AS_QteCom,
+                                                 AS_QtePrepa,
+                                                 AS_MontSto,
+                                                 AS_QteMini,
+                                                 AS_QteMaxi
+                                             )
+                                             VALUES (
+                                                 @AR_Ref,
+                                                 @DE_No,
+                                                 @DP_NoPrincipal,
+                                                 @Qte,
+                                                 0, 0, 0, 0, 0, 0
+                                             )";
 
-                                        using (SqlCommand insertCmd = new SqlCommand(insertSql, connection))
-                                        {
-                                            insertCmd.Parameters.AddWithValue("@AR_Ref", reference);
-                                            insertCmd.Parameters.AddWithValue("@DE_No", DE_No);
-                                            insertCmd.Parameters.AddWithValue("@DP_NoPrincipal", 1);
-                                            insertCmd.Parameters.AddWithValue("@Qte", qte);
+                                         using (SqlCommand insertCmd = new SqlCommand(insertSql, connection))
+                                         {
+                                             insertCmd.Parameters.AddWithValue("@AR_Ref", reference);
+                                             insertCmd.Parameters.AddWithValue("@DE_No", DE_No);
+                                             insertCmd.Parameters.AddWithValue("@DP_NoPrincipal", 1);
+                                             insertCmd.Parameters.AddWithValue("@Qte", qte);
 
-                                            insertCmd.ExecuteNonQuery();
-                                        }
-                                    }
-                                    else
-                                    {
-                                            string updateSql = @"
-                                            UPDATE F_ARTSTOCK
-                                            SET AS_QteSto = AS_QteSto + @Qte
-                                            WHERE AR_Ref = @AR_Ref AND DE_No = @DE_No";
+                                             insertCmd.ExecuteNonQuery();
+                                         }
+                                     }
+                                     else
+                                     {
+                                             string updateSql = @"
+                                             UPDATE F_ARTSTOCK
+                                             SET AS_QteSto = AS_QteSto + @Qte
+                                             WHERE AR_Ref = @AR_Ref AND DE_No = @DE_No";
 
-                                            using (SqlCommand updateCmd = new SqlCommand(updateSql, connection))
-                                            {
-                                                updateCmd.Parameters.AddWithValue("@AR_Ref", reference);
-                                                updateCmd.Parameters.AddWithValue("@DE_No", DE_No);
-                                                updateCmd.Parameters.AddWithValue("@Qte", qte);
+                                             using (SqlCommand updateCmd = new SqlCommand(updateSql, connection))
+                                             {
+                                                 updateCmd.Parameters.AddWithValue("@AR_Ref", reference);
+                                                 updateCmd.Parameters.AddWithValue("@DE_No", DE_No);
+                                                 updateCmd.Parameters.AddWithValue("@Qte", qte);
 
-                                                updateCmd.ExecuteNonQuery();
-                                            }
-                                    }
-                                }
+                                                 updateCmd.ExecuteNonQuery();
+                                             }
+                                     }
+                                 }*/
+
+                                //MAJ des articles par lot
+                                simpleButton2_Click(sender, e);   
                             }
                             catch (System.Data.Entity.Infrastructure.DbUpdateException ex)
                             {
@@ -3932,7 +3987,7 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                             {
                                 MessageBox.Show(ex.Message, "Erreur");
                             }
-
+                               
                             
                         }
                         // Fix for CS0120: Use the instance of ucDocuments instead of trying to call it statically
@@ -5381,14 +5436,92 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
         private void textSearch_TextChanged(object sender, EventArgs e)
         {
             treeList1.Columns["DESIGNATION"].OptionsFilter.AllowFilter = true;
-            
-            //treeList1.FindFilterText = string.Empty;
+
             treeList1.FindFilterText = textSearch.Text;
         }
 
-        private void textSearch_EditValueChanged(object sender, EventArgs e)
+        private void simpleButton2_Click(object sender, EventArgs e)
         {
+            int? DE_No = Convert.ToInt32(lkDepot.EditValue);
+            for (int i = 0; i < gvLigneEdit.RowCount; i++)
+            {
+                string reference = gvLigneEdit.GetRowCellValue(i, "AR_Ref")?.ToString();
+                var qte = gvLigneEdit.GetRowCellValue(i, "DL_Qte");
+                string designation = gvLigneEdit.GetRowCellValue(i, "DL_Design")?.ToString();
 
+                string connectionStringArbio = $"Server={serveripPrincipale};Database=ARBIOCHEM;" +
+                                                 $"User ID=Dev;Password=1234;TrustServerCertificate=True;" +
+                                                 $"Connection Timeout=240;";
+
+                using (SqlConnection connection = new SqlConnection(connectionStringArbio))
+                {
+                    connection.Open();
+
+                    string sql = @"
+                    SELECT TOP 1 AR_SuiviStock
+                    FROM F_ARTICLE
+                    WHERE AR_Ref IN (SELECT AR_Ref FROM F_ARTSTOCK WHERE AR_Ref= @AR_Ref AND DE_No = @DE_No)";
+
+                    using (SqlCommand checkCmd = new SqlCommand(sql, connection))
+                    {
+                        checkCmd.Parameters.AddWithValue("@AR_Ref", reference);
+                        checkCmd.Parameters.AddWithValue("@DE_No", DE_No);
+
+                        object result = checkCmd.ExecuteScalar();
+
+                        if (result != null && result != DBNull.Value)
+                        {
+                            int arSuiviStock = Convert.ToInt32(result);
+
+                            if (arSuiviStock == 5)
+                            {
+                                frmLotSerie frmLotS = new frmLotSerie();
+                                frmLotS.txtreference.Text = reference;
+                                frmLotS.txtdepot.Text = lkDepot.Text.ToString();
+                                frmLotS.txtdesignation.Text = designation;
+                                frmLotS.txtqte.Text = qte.ToString();
+                                frmLotS.textDE_NO.Text = lkDepot.EditValue.ToString();
+                                frmLotS.txtligne.Text = recuperer_DLNo(dopiecetxt.Text, reference).ToString();
+                                frmLotS.ShowDialog();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private int recuperer_DLNo(string doPiece, string arRef)
+        {
+            int dlNo = 0;
+
+            string connectionStringArbio =
+                "Server=26.53.123.231;Database=ARBIOCHEM_ACHAT;User ID=Dev;Password=1234;";
+
+            using (SqlConnection connection = new SqlConnection(connectionStringArbio))
+            {
+                connection.Open();
+
+                string sql = @"
+            SELECT TOP 1 DL_No
+            FROM F_DOCLIGNE
+            WHERE AR_Ref = @AR_Ref
+              AND DO_PIECE = @DO_PIECE";
+
+                using (SqlCommand cmd = new SqlCommand(sql, connection))
+                {
+                    cmd.Parameters.Add("@AR_Ref", SqlDbType.VarChar).Value = arRef;
+                    cmd.Parameters.Add("@DO_PIECE", SqlDbType.VarChar).Value = doPiece;
+
+                    object result = cmd.ExecuteScalar();
+
+                    if (result != null && result != DBNull.Value)
+                    {
+                        dlNo = Convert.ToInt32(result);
+                    }
+                }
+            }
+
+            return dlNo;
         }
     }
 }

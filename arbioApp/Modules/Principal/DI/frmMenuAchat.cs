@@ -214,7 +214,7 @@ namespace arbioApp.Modules.Principal.DI
 
                     try
                     {
-                        string connectionString = "Server=26.71.34.164;Database=TRANSIT;Trusted_Connection=True;";
+                        string connectionString = "Server=26.71.34.164;Database=TRANSIT;User ID=Dev;Password=1234;";
 
                         using (SqlConnection connection = new SqlConnection(connectionString))
                         {
