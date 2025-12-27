@@ -5473,7 +5473,7 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                         {
                             int arSuiviStock = Convert.ToInt32(result);
 
-                            if (arSuiviStock == 5)
+                            if (arSuiviStock == 2)
                             {
                                 frmLotSerie frmLotS = new frmLotSerie();
                                 frmLotS.txtreference.Text = reference;

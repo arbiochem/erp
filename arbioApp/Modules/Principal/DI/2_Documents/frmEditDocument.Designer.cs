@@ -1419,7 +1419,7 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
             this.layoutControlItem40.Size = new System.Drawing.Size(182, 82);
             this.layoutControlItem40.TextSize = new System.Drawing.Size(0, 0);
             this.layoutControlItem40.TextVisible = false;
-            //this.layoutControlItem40.Visibility = DevExpress.XtraLayout.Utils.LayoutVisibility.Never;
+            this.layoutControlItem40.Visibility = DevExpress.XtraLayout.Utils.LayoutVisibility.Never;
             // 
             // treeList1
             // 

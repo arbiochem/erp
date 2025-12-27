@@ -21,10 +21,15 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
 
         private void simpleButton1_Click(object sender, EventArgs e)
         {
-            if(txtLot.Text =="" || string.IsNullOrWhiteSpace(txtLot.Text))
+            if (txtLot.Text == "" || string.IsNullOrWhiteSpace(txtLot.Text))
             {
                 MessageBox.Show($"Le nom du lot ne peut pas être vide", "Erreur", MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+            }
+            else if (dt_peremption.Text == "" || string.IsNullOrWhiteSpace(dt_peremption.Text))
+            {
+                MessageBox.Show($"La date de péremption ne peut pas être vide", "Erreur", MessageBoxButtons.OK,
+                     MessageBoxIcon.Error);
             }
             else
             {
@@ -51,9 +56,9 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                             // ✅ INSERT
                             string sql = @"
                             INSERT INTO F_LOTSERIE
-                            (LS_NoSerie, AR_Ref, DE_No, LS_Qte, DL_NoIn,LS_MvtStock)
+                            (LS_NoSerie, AR_Ref, DE_No, LS_Qte, DL_NoIn,LS_MvtStock,LS_Peremption)
                             VALUES
-                            (@LS_NoSerie, @AR_Ref, @DE_No, @Qte, @DL_NoIn,@LS_MvtStock)";
+                            (@LS_NoSerie, @AR_Ref, @DE_No, @Qte, @DL_NoIn,@LS_MvtStock,@LS_Peremption)";
 
                             using (SqlCommand cmd = new SqlCommand(sql, connection, tran))
                             {
@@ -63,6 +68,7 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
                                 cmd.Parameters.Add("@Qte", SqlDbType.Decimal).Value = decimal.Parse(txtqte.Text);
                                 cmd.Parameters.Add("@DL_NoIn", SqlDbType.Int).Value = int.Parse(txtligne.Text);
                                 cmd.Parameters.Add("@LS_MvtStock", SqlDbType.Int).Value = 1;
+                                cmd.Parameters.Add("@LS_Peremption", SqlDbType.DateTime).Value = dt_peremption.Text;
 
                                 cmd.ExecuteNonQuery();
                             }
@@ -92,7 +98,7 @@ namespace arbioApp.Modules.Principal.DI._2_Documents
 
         private void frmLotSerie_Load(object sender, EventArgs e)
         {
-
+            this.ControlBox = false;
         }
     }
 }
